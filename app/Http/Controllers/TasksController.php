@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Task;
+
 class TasksController extends Controller
 {
     /**
@@ -13,7 +15,11 @@ class TasksController extends Controller
      */
     public function index()
     {
-        //
+        $tasks = Task::all();
+        
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            ]);
     }
 
     /**
@@ -23,7 +29,12 @@ class TasksController extends Controller
      */
     public function create()
     {
-        //
+        $task = new Task;
+
+        // メッセージ作成ビューを表示
+        return view('tasks.create', [
+            'task' => $task,
+        ]);
     }
 
     /**
@@ -34,7 +45,15 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // 送られてきたフォームの内容は $request に入っている。
+        // メッセージを作成
+        $task = new Task;
+        $task->content = $request->content;
+        $task->save();
+
+        // トップページへリダイレクトさせる。
+        // （viewを作成する必要はないでしょう。）
+        return redirect('/');
     }
 
     /**
@@ -45,7 +64,14 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-        //
+        // 当該idのレコードをfindOrFailメソッドにて取得し、変数へ代入。
+        $task = Task::findOrFail($id);
+
+        // メッセージ詳細ビューでそれを表示
+        // message.showのルーティングが走った時、$messageを取得し、viewに渡して表示。
+        return view('tasks.show', [
+            'task' => $task,
+        ]);
     }
 
     /**
@@ -56,7 +82,15 @@ class TasksController extends Controller
      */
     public function edit($id)
     {
-        //
+        // idの値でメッセージを検索して取得
+        // 当該idのレコードをfindOrFailメソッドにて取得し、変数へ代入。
+        $task = Task::findOrFail($id);
+
+        // メッセージ編集ビューでそれを表示
+        // message.editのルーティングが走った時、$messageを取得し、viewに渡して表示。
+        return view('tasks.edit', [
+            'task' => $task,
+        ]);
     }
 
     /**
@@ -68,7 +102,18 @@ class TasksController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // idの値でメッセージを検索して取得し、それを変数へ代入。
+        $task = Task::findOrFail($id);
+        // メッセージを更新
+        // リクエストで入力されたデータは、$requestに入っているため、
+        // $requestのプロパティ：$request->contentを$message->contentへ代入し差し替え、
+        // save()メソッドにて保存。
+        $task->content = $request->content;
+        $task->save();
+
+        // トップページへリダイレクトさせる
+        // リダイレクトしているため、viewの作成は不要。
+        return redirect('/');
     }
 
     /**
@@ -79,6 +124,13 @@ class TasksController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // idの値でメッセージを検索して取得し、モデルをインスタンスのインスタンスに差し替える。
+        $task = Task::findOrFail($id);
+        // メッセージを削除
+        $task->delete();
+
+        // トップページへリダイレクトさせる
+        // リダイレクトりしているため、viewは不要。
+        return redirect('/');
     }
 }
