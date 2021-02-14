@@ -45,10 +45,17 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
+        // バリデーション
+        $request->validate([
+            'content' => 'required|max:255',
+            'status' => 'required|max:10',
+        ]);
+        
         // 送られてきたフォームの内容は $request に入っている。
         // メッセージを作成
         $task = new Task;
         $task->content = $request->content;
+        $task->status = $request->status;
         $task->save();
 
         // トップページへリダイレクトさせる。
@@ -102,6 +109,12 @@ class TasksController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // バリデーション
+        $request->validate([
+            'content' => 'required|max:255',
+            'status' => 'required|max:10',
+        ]);
+        
         // idの値でメッセージを検索して取得し、それを変数へ代入。
         $task = Task::findOrFail($id);
         // メッセージを更新
@@ -109,6 +122,7 @@ class TasksController extends Controller
         // $requestのプロパティ：$request->contentを$message->contentへ代入し差し替え、
         // save()メソッドにて保存。
         $task->content = $request->content;
+        $task->status = $request->status;
         $task->save();
 
         // トップページへリダイレクトさせる

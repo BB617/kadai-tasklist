@@ -15,6 +15,11 @@
                     <!--<input type="text" value='' class='form-contorl'></input>に相当。-->
                     {!! Form::text('content', null, ['class' => 'form-control']) !!}
                 </div>
+                
+                <div class="form-group">
+                    {!! Form::label('status', 'ステータス:') !!}
+                    {!! Form::text('status', null, ['class' => 'form-control']) !!}
+                </div>
 
                 {!! Form::submit('追加', ['class' => 'btn btn-primary']) !!}
 
