@@ -15,11 +15,26 @@ class TasksController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
+        // $tasks = Task::all();
         
-        return view('tasks.index', [
-            'tasks' => $tasks,
-            ]);
+        // return view('tasks.index', [
+        //     'tasks' => $tasks,
+        //     ]);
+        
+        $data =[];
+        
+        if(\Auth::check()){
+            $user = \Auth::user();
+            
+            $tasks = $user->tasks()->paginate(10);
+            
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+                ];
+        }
+        
+        return view('tasks.index', $data);
     }
 
     /**
@@ -51,11 +66,14 @@ class TasksController extends Controller
             'status' => 'required|max:10',
         ]);
         
+        $user = \Auth::user();
+        
         // 送られてきたフォームの内容は $request に入っている。
         // メッセージを作成
         $task = new Task;
         $task->content = $request->content;
         $task->status = $request->status;
+        $task->user_id = $user->id;
         $task->save();
 
         // トップページへリダイレクトさせる。

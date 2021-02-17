@@ -6,13 +6,13 @@
 
     <div class="row">
         <div class="col-6">
-            <!--<form method='POST' action='/message/store'>に相当。-->
+            
             {!! Form::model($task, ['route' => 'tasks.store']) !!}
 
                 <div class="form-group">
-                    <!--<label></label>に相当。-->
+                    
                     {!! Form::label('content', 'タスク:') !!}
-                    <!--<input type="text" value='' class='form-contorl'></input>に相当。-->
+
                     {!! Form::text('content', null, ['class' => 'form-control']) !!}
                 </div>
                 
