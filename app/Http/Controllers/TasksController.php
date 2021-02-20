@@ -44,12 +44,20 @@ class TasksController extends Controller
      */
     public function create()
     {
-        $task = new Task;
+        
+        if(\Auth::check()){
+            
+            $task = new Task;
 
         // メッセージ作成ビューを表示
         return view('tasks.create', [
             'task' => $task,
         ]);
+        
+        }
+        
+        return redirect('/');
+        
     }
 
     /**
@@ -60,7 +68,10 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
-        // バリデーション
+        
+        if(\Auth::check()){
+            
+            // バリデーション
         $request->validate([
             'content' => 'required|max:255',
             'status' => 'required|max:10',
@@ -74,11 +85,17 @@ class TasksController extends Controller
         $task->content = $request->content;
         $task->status = $request->status;
         $task->user_id = $user->id;
+        
         $task->save();
 
         // トップページへリダイレクトさせる。
         // （viewを作成する必要はないでしょう。）
         return redirect('/');
+            
+        }
+        
+        return redirect('/');
+        
     }
 
     /**
@@ -91,12 +108,17 @@ class TasksController extends Controller
     {
         // 当該idのレコードをfindOrFailメソッドにて取得し、変数へ代入。
         $task = Task::findOrFail($id);
-
-        // メッセージ詳細ビューでそれを表示
-        // message.showのルーティングが走った時、$messageを取得し、viewに渡して表示。
-        return view('tasks.show', [
-            'task' => $task,
-        ]);
+        
+        // 当該タスクのuser_idとログインしているユーザのid一致しているかどうかで条件分岐。
+        if(\Auth::id() === $task->user_id){
+            // メッセージ詳細ビューでそれを表示
+            // message.showのルーティングが走った時、$messageを取得し、viewに渡して表示。
+            return view('tasks.show', [
+                'task' => $task,
+            ]);
+        }
+        
+        return redirect('/');
     }
 
     /**
@@ -107,15 +129,17 @@ class TasksController extends Controller
      */
     public function edit($id)
     {
-        // idの値でメッセージを検索して取得
         // 当該idのレコードをfindOrFailメソッドにて取得し、変数へ代入。
         $task = Task::findOrFail($id);
-
-        // メッセージ編集ビューでそれを表示
-        // message.editのルーティングが走った時、$messageを取得し、viewに渡して表示。
-        return view('tasks.edit', [
-            'task' => $task,
-        ]);
+        // 当該タスクのuser_idとログインしているユーザのid一致しているかどうかで条件分岐。
+        if(\Auth::id() === $task->user_id){
+            // メッセージ詳細ビューでそれを表示
+            // message.showのルーティングが走った時、$messageを取得し、viewに渡して表示。
+            return view('tasks.edit', [
+                'task' => $task,
+            ]);
+        }
+        return redirect('/');
     }
 
     /**
@@ -135,16 +159,16 @@ class TasksController extends Controller
         
         // idの値でメッセージを検索して取得し、それを変数へ代入。
         $task = Task::findOrFail($id);
-        // メッセージを更新
-        // リクエストで入力されたデータは、$requestに入っているため、
-        // $requestのプロパティ：$request->contentを$message->contentへ代入し差し替え、
-        // save()メソッドにて保存。
-        $task->content = $request->content;
-        $task->status = $request->status;
-        $task->save();
+        
+        if(\Auth::id() === $task->user_id){
 
-        // トップページへリダイレクトさせる
-        // リダイレクトしているため、viewの作成は不要。
+            $task->content = $request->content;
+            $task->status = $request->status;
+            $task->save();
+
+            return redirect('/');
+        }
+        
         return redirect('/');
     }
 
@@ -158,11 +182,15 @@ class TasksController extends Controller
     {
         // idの値でメッセージを検索して取得し、モデルをインスタンスのインスタンスに差し替える。
         $task = Task::findOrFail($id);
-        // メッセージを削除
-        $task->delete();
+        
+        if(\Auth::id() === $task->user_id){
+            
+            // メッセージを削除
+            $task->delete();
 
-        // トップページへリダイレクトさせる
-        // リダイレクトりしているため、viewは不要。
+            return redirect('/');
+        }
+        
         return redirect('/');
     }
 }
